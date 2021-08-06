@@ -57,7 +57,7 @@ module.exports = class Profile {
                 const db = await getDb();
                 let defaultProfile = this.getDefault();
                 if (defaultProfile) {
-                    await db.collection('profiles').insertOne();
+                    await db.collection('profiles').insertOne(defaultProfile);
                     await this.load();
                 }
             }
@@ -105,9 +105,17 @@ module.exports = class Profile {
         let blocked = unblock ? null : moment().unix();
 
         const db = await getDb();
-        await db.collection('users').updateOne({id: this.userId, botId: this.profile.botId}, {$set: {blocked}});
-        await db.collection('profiles').updateOne({userId: this.userId, botId: this.profile.botId}, {$set: {blocked}});
-        this.profile.blocked = blocked;
+        if (this.profile) {
+            if (this.profile.botId) {
+                await db.collection('users').updateOne({id: this.userId, botId: this.profile.botId}, {$set: {blocked}});
+                await db.collection('profiles').updateOne({
+                    userId: this.userId,
+                    botId: this.profile.botId
+                }, {$set: {blocked}});
+            }
+
+            this.profile.blocked = blocked;
+        }
 
         return this.profile;
     }

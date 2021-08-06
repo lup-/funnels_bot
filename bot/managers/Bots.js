@@ -17,7 +17,9 @@ module.exports = class BotManager {
         return next();
     }
 
-    createBot(bot) {
+    async createBot(bot) {
+        console.log(`Starting bot ${bot.username}...`)
+
         let app = setupBot(bot.token)
             .addSession({})
             .addSafeReply(this.blockedHandler)
@@ -42,7 +44,13 @@ module.exports = class BotManager {
             .get();
 
         app.botDbId = bot.id;
-        app.launch();
+        try {
+            await app.launch();
+        }
+        catch (e) {
+            console.error(e);
+            return false;
+        }
 
         return app;
     }
@@ -96,9 +104,21 @@ module.exports = class BotManager {
         return this.botFunnels;
     }
 
+    async launchBotList(bots) {
+        let runningBots = []
+        for (let bot of bots) {
+            let runningBot = await this.createBot(bot);
+            if (runningBot) {
+                runningBots.push(runningBots);
+            }
+        }
+
+        return runningBots;
+    }
+
     async launchBots() {
         await this.loadBots();
-        this.runningBots = this.allBots.map(this.createBot.bind(this));
+        this.runningBots = await this.launchBotList(this.allBots);
         return this.runningBotsInfo();
     }
 
@@ -109,7 +129,7 @@ module.exports = class BotManager {
         let newBotNames = allUsernames.filter(name => runningBotUsernames.indexOf(name) === -1);
         if (newBotNames.length > 0) {
             let newBots = this.allBots.filter(bot => newBotNames.indexOf(bot.username) !== -1);
-            let newRunningBots = newBots.map(this.createBot.bind(this));
+            let newRunningBots = await this.launchBotList(newBots);
             this.runningBots = this.runningBots.concat(newRunningBots);
         }
 
