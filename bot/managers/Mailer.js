@@ -61,6 +61,10 @@ module.exports = class Mailer {
 
         let db = await getDb();
         let bots = await this.getMailingBots(mailing);
+        if (!bots) {
+            return [];
+        }
+
         let botTlgIds = bots.map(bot => bot.botId);
 
         let foundUsers = await db.collection('users').find({
@@ -179,6 +183,9 @@ module.exports = class Mailer {
 
     async getMailingBots(mailing) {
         let botIds = mailing.bots;
+        if (!botIds) {
+            return false;
+        }
         let db = await getDb();
         return db.collection('bots').find({ id: {$in: botIds} }).toArray();
     }
