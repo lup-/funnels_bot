@@ -28,6 +28,7 @@ module.exports = class BotManager {
             .addUserSave()
             .addProfile()
             .addSaveActivity()
+            .addSubscription()
             .addFunnels(bot, this)
             .addHandleBlocks()
             .addScenes()

@@ -19,6 +19,19 @@
 
                             <v-row class="mt-4">
                                 <v-col cols="12">
+                                    <v-combobox v-model="item.needsSubscription"
+                                                label="Требовать подписку"
+                                                multiple
+                                                chips
+                                                deletable-chips
+                                                hint="Например: @vcblr"
+                                                persistent-hint
+                                    ></v-combobox>
+                                </v-col>
+                            </v-row>
+
+                            <v-row class="mt-4">
+                                <v-col cols="12">
                                     <v-select
                                         label="Воронки в боте"
                                         :items="allFunnels"
