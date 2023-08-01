@@ -107,6 +107,7 @@ async function sendMessage(telegram, chatId, message, stage = null, mailing = nu
     let isStageMessage = stage !== null;
     let hasVideo = message.videos && message.videos.length > 0;
     let hasPhoto = message.photos && message.photos.length > 0;
+    let hasDoc = message.other && message.other.length > 0;
     let hasCaption = caption.length > 0;
     let hasButtons = message.buttons && message.buttons.length > 0;
 
@@ -162,6 +163,15 @@ async function sendMessage(telegram, chatId, message, stage = null, mailing = nu
         }
     }
 
+    if (hasDoc) {
+        let docMedias = message.other.map(doc => {
+            let url = encodeURI(doc.src);
+            return {media: {url}, type: 'document'}
+        });
+
+        medias = medias.concat(docMedias);
+    }
+
     let hasMedia = medias.length > 0;
     let hasOneMedia = medias.length === 1;
 
@@ -174,12 +184,19 @@ async function sendMessage(telegram, chatId, message, stage = null, mailing = nu
                 : {url: encodeURI(message.videos[0].src)};
             singleMediaMessage = await telegram.sendVideo(chatId, media, mediaExtra);
         }
-        else {
+        else if (hasPhoto) {
             let savedFile = message.photos[0].telegramFiles && message.photos[0].telegramFiles[botId];
             let media = savedFile
                 ? savedFile.file_id
                 : {url: encodeURI(message.photos[0].src)};
             singleMediaMessage = await telegram.sendPhoto(chatId, media, mediaExtra);
+        }
+        else {
+            let savedFile = message.other[0].telegramFiles && message.other[0].telegramFiles[botId];
+            let media = savedFile
+                ? savedFile.file_id
+                : {url: encodeURI(message.other[0].src), filename: message.other[0].name};
+            singleMediaMessage = await telegram.sendDocument(chatId, media, mediaExtra);
         }
 
         sentMessages.push(singleMediaMessage);

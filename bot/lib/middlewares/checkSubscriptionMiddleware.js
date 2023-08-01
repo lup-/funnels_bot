@@ -50,10 +50,10 @@ module.exports = async (ctx, next) => {
         return next();
     }
 
-    let botName = process.env.BOT_NAME;
-    let db = await getDb('botofarmer');
-    let settings = db.collection('botSettings');
-    let botSettings = await settings.findOne({botName});
+    let botId = ctx.session.botId;
+    let db = await getDb();
+    let settings = db.collection('bots');
+    let botSettings = await settings.findOne({botId});
     let needsSubscription = botSettings && botSettings.needsSubscription && botSettings.needsSubscription.length > 0;
 
     if (needsSubscription) {
