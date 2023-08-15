@@ -66,7 +66,7 @@ services:
     command: npm run start
 
   mongo:
-    image: mongo
+    image: mongo:4
     restart: ${RESTART}
     volumes:
       - ./etc/database:/data/db

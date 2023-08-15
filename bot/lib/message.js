@@ -6,7 +6,8 @@ const SHORT_LINK_BASE=process.env.SHORT_LINK_BASE;
 const UPLOAD_DIR=process.env.UPLOAD_DIR;
 
 function makeButtonUrl(button, stageId, chatId, botId) {
-    return `${SHORT_LINK_BASE}/go/${button.linkId}/${stageId}/${chatId}/${botId}`;
+    //return `${SHORT_LINK_BASE}/go/${button.linkId}/${stageId}/${chatId}/${botId}`;
+    return button.target;
 }
 
 function dataUriToBuffer(uri) {
